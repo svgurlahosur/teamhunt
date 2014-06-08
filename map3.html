@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!-- tested with google chrome -->
+<html>
+    <head>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+        <script>
+            var map,
+                mLat,
+                mLng;
+                
+            function initialize() {
+                var mapOptions = {
+                    zoom: 4,
+                    center: new google.maps.LatLng(47.0000, 2.0000),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                };
+                map = new google.maps.Map(document.getElementById('map_canvas'),
+                    mapOptions
+                );
+                // add a click event listener to
+                // get the lat/lng from click event of map
+                google.maps.event.addListener(map, 'click', function(event) {
+                    mLat = event.latLng.lat();
+                    mLng = event.latLng.lng();
+                    document.getElementById('latMap').value = mLat;
+                    document.getElementById('lngMap').value = mLng;
+                });
+            }
+            function mapDivClicked (event) {
+                var target = document.getElementById('map_canvas'),
+                    posx = event.pageX - target.offsetLeft,
+                    posy = event.pageY - target.offsetTop,
+                    bounds = map.getBounds(),
+                    neLatlng = bounds.getNorthEast(),
+                    swLatlng = bounds.getSouthWest(),
+                    startLat = neLatlng.lat(),
+                    endLng = neLatlng.lng(),
+                    endLat = swLatlng.lat(),
+                    startLng = swLatlng.lng(),
+                    lat = startLat + ((posy/350) * (endLat - startLat)),
+                    lng = startLng + ((posx/500) * (endLng - startLng));
+
+                document.getElementById('posX').value = posx;
+                document.getElementById('posY').value = posy;
+                document.getElementById('lat').value = lat; // calculated lat
+                document.getElementById('lng').value = lng; // calculated lng
+
+                // the error rate
+                document.getElementById('latErr').value = ((mLat - lat) / (endLat - startLat) * 100).toFixed(2);
+                document.getElementById('lngErr').value = ((mLng - lng) / (endLng - startLng) * 100).toFixed(2);
+            }
+            
+            function myFunction() {
+                var x;
+                var y;
+                x=Math.round(document.getElementById('lat').value);
+                y=Math.round(document.getElementById('lng').value);
+                
+                if(48 == x && 47==y){ confirm("Success - You Found The Capital[Paris]");            }
+                else {confirm("Wrong location!! Try Again");}            }
+            google.maps.event.addDomListener(window, 'load', initialize);
+        </script>
+    </head>
+    <body>
+        <div id="map_canvas" onclick="mapDivClicked(event);" style="height: 350px; width: 1000px;"></div>
+        <div>
+            mouse x: <input id="posX" />
+            mouse y: <input id="posY" />
+            <p>Click the button to display a confirm box.</p>
+
+<button onclick="myFunction()">Check answer</button>
+
+<p id="demo"></p>
+        </div>
+        <div>
+            lat: <input id="lat" />
+            lng: <input id="lng" />
+        </div>
+        <div>
+            lat from map: <input id="latMap" />
+            lng from map: <input id="lngMap" />
+        </div>
+    </body>
+</html>
